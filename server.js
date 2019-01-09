@@ -21,27 +21,13 @@
     });
 
     // Mongo and Mongoose
-    mongoose.connect("mongodb://localhost/ScraperHW", {useNewUrlParser: true});
-
-
-
-    app.get("/scrape", function(req, res){
-        axios.get("https://www.nytimes.com/section/world").then(function(response){
-            const $ = cheerio.load(response.data);
-
-            $("article h2 a").each(function(i, element) {
-                var result = {};
-                result.title = $(this).text();
-                result.link = $(this).attr("href");
-                db.Article.create(result).then(function(dbArticle)
-                {console.log(dbArticle);
-                }).catch(function(err){
-                    console.log(err);
-                });
-            });
-        });
-        res.send("Completed Scrape")
-    });
+   // mongoose.connect("mongodb://localhost/ScraperHW", {useNewUrlParser: true});
+   const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+   mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
+   
+    // sets routing through the controllers
+    const routing = require("./controllers/apiRoutes");
+    app.use(routing);
 
     // server status and console
     app.listen(PORT, function() {
